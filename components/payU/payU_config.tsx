@@ -12,13 +12,17 @@ import SubmitButton from "./submit_btn";
 
 const PayUConfig = () => {
   const [formData, setFormData] = useState<FormData>(initialFormData);
+  const [selectedProductIndex, setSelectedProductIndex] = useState<number | null>(null);
 
   const handleProductChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedProduct = products[parseInt(e.target.value, 10)];
+    const index = parseInt(e.target.value, 10);
+    setSelectedProductIndex(index);
+    const selectedProduct = products[index];
     setFormData({
       ...formData,
       description: selectedProduct.description,
       amount: selectedProduct.amount,
+      referenceCode: selectedProduct.referenceCode || `REF${Date.now()}`, // Generate unique reference if not provided
     });
   };
 
@@ -41,23 +45,29 @@ const PayUConfig = () => {
       setFormData((prevData) => ({
         ...prevData,
         signature: signature,
+        merchantId: AUTH.merchantId, // Ensure merchantId is set
+        currency: "COP", // Set default currency (adjust as needed)
       }));
-      console.log(signature);
     }
-  }, [formData.amount, formData.currency]);
+  }, [formData.amount, formData.currency, formData.referenceCode]);
 
   const handleSubmit = () => {
+    // Validate required fields
+    if (!formData.description || !formData.amount || !formData.buyerEmail || !formData.buyerFullName) {
+      alert("Please fill all required fields (description, amount, email, and full name).");
+      return;
+    }
+
     const form = document.createElement("form");
     form.method = "POST";
-    form.action =
-      "https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/";
+    form.action = "https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/";
 
     for (const key in formData) {
       if (formData.hasOwnProperty(key)) {
         const hiddenField = document.createElement("input");
         hiddenField.type = "hidden";
         hiddenField.name = key;
-        hiddenField.value = formData[key as keyof FormData];
+        hiddenField.value = formData[key as keyof FormData] || "";
         form.appendChild(hiddenField);
       }
     }
