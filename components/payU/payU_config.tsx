@@ -60,8 +60,8 @@ const PayUConfig = () => {
 
     const form = document.createElement("form");
     form.method = "POST";
-    // form.action = "https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/";
-    form.action = "https://checkout.payulatam.com/ppp-web-gateway-payu/";
+    form.action = "https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/";
+    // form.action = "https://checkout.payulatam.com/ppp-web-gateway-payu/";
 
     for (const key in formData) {
       if (formData.hasOwnProperty(key)) {
